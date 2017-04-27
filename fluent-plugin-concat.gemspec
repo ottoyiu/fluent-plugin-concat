@@ -3,14 +3,14 @@ lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
-  spec.name          = "fluent-plugin-concat"
+  spec.name          = "fluent-plugin-concat-k8s"
   spec.version       = "1.0.0"
-  spec.authors       = ["Kenji Okimoto"]
+  spec.authors       = ["Kenji Okimoto", "Otto Yiu"]
   spec.email         = ["okimoto@clear-code.com"]
 
   spec.summary       = "Fluentd Filter plugin to concat multiple event messages"
   spec.description   = "Fluentd Filter plugin to concat multiple event messages"
-  spec.homepage      = "https://github.com/okkez/fluent-plugin-concat"
+  spec.homepage      = "https://github.com/ottoyiu/fluent-plugin-concat"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0").reject {|f| f.match(%r{^(test|spec|features)/}) }

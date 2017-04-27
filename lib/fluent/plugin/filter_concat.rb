@@ -1,6 +1,6 @@
 module Fluent
   class ConcatFilter < Filter
-    Plugin.register_filter("concat", self)
+    Plugin.register_filter("k8s_concat", self)
 
     desc "The key for part of multiline log"
     config_param :key, :string, required: true
@@ -20,6 +20,8 @@ module Fluent
     config_param :timeout_label, :string, default: nil
     desc "Use timestamp of first record when buffer is flushed"
     config_param :use_first_timestamp, :bool, default: false
+    desc "The record key that overrides multiline_start_regexp"
+    config_param :regexp_override_key, :string, default: "kubernetes_annotations_multiline_log"
 
     class TimeoutError < StandardError
     end
@@ -117,7 +119,7 @@ module Fluent
         end
       when :regexp
         case
-        when firstline?(record[@key])
+        when firstline?(record, @key)
           if @buffer[stream_identity].empty?
             @buffer[stream_identity] << [tag, time, record]
             if lastline?(record[@key])
@@ -155,8 +157,12 @@ module Fluent
       new_es
     end
 
-    def firstline?(text)
-      @multiline_start_regexp && !!@multiline_start_regexp.match(text)
+    def firstline?(record, key)
+      start_regexp = @multiline_start_regexp
+      if record.has_key? @regexp_override_key and record[@regexp_override_key].match(/^\/.+\/$/)
+        start_regexp = Regexp.compile(record[@regexp_override_key][1..-2])
+      end
+      start_regexp && !!start_regexp.match(record[key])
     end
 
     def lastline?(text)
